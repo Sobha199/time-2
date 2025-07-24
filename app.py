@@ -29,7 +29,7 @@ def login_page():
     username = st.text_input("Employee ID", key="emp_id", help="Enter your Employee ID")
     password = st.text_input("Password", type="password", key="pwd", help="Enter your password")
     if st.button("Login"):
-        match = login_df[(login_df["Emp ID"].astype(str) == username) & (login_df["Password"] == password)]
+        match = login_df[(login_df["username"].astype(str) == username) & (login_df["Password"] == password)]
         if not match.empty:
             st.session_state.logged_in = True
             st.session_state.username = username
