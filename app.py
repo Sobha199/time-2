@@ -65,7 +65,7 @@ def login_page():
                 st.session_state.authenticated = True
                 st.session_state.emp_id = username
                 st.session_state.emp_name = match.iloc[0]["Emp Name"]
-                st.session_state.team_lead = match.iloc[0]["Team Lead Name"]
+                st.session_state.team_lead = match.iloc[0]["Team Lead"]
                 log_session_start(username)
             else:
                 st.error("Invalid credentials")
