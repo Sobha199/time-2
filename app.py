@@ -44,7 +44,7 @@ def log_session_end():
             "Emp Name": st.session_state.emp_name,
             "Login Time": st.session_state.login_time,
             "Logout Time": logout_time,
-            "Hours": round(duration, 2)
+            "minutes": round(duration, 2)
         }])
         if os.path.exists(SESSION_LOG_PATH):
             df.to_csv(SESSION_LOG_PATH, mode="a", header=False, index=False)
@@ -158,4 +158,4 @@ else:
         st.session_state.emp_name = ""
         st.session_state.team_lead = ""
         st.session_state.login_time = None
-        st.success("Logged out successfully. Please refresh the app.")
+        st.success("Logged out successfully.")
