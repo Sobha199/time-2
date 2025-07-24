@@ -59,7 +59,7 @@ def login_page():
         password = st.text_input("Password", type="password", key="pass")
         submitted = st.form_submit_button("Sign In")
         if submitted:
-            match = login_df[(login_df["Emp ID"].astype(str) == username) & (login_df["Password"] == password)]
+            match = login_df[(login_df["Username"].astype(str) == username) & (login_df["Password"] == password)]
             if not match.empty:
                 st.success("Login Successful")
                 st.session_state.authenticated = True
