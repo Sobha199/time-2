@@ -158,4 +158,4 @@ else:
         st.session_state.emp_name = ""
         st.session_state.team_lead = ""
         st.session_state.login_time = None
-        st.success("Logged out successfully. Please refresh the app.")
+        st.success("Logged out successfully.")
