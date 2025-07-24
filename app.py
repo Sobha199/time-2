@@ -44,7 +44,7 @@ def log_session_end():
             "Emp Name": st.session_state.emp_name,
             "Login Time": st.session_state.login_time,
             "Logout Time": logout_time,
-            "minutes": round(duration, 2)
+            "Hours": round(duration, 2)
         }])
         if os.path.exists(SESSION_LOG_PATH):
             df.to_csv(SESSION_LOG_PATH, mode="a", header=False, index=False)
@@ -59,63 +59,57 @@ def login_page():
         password = st.text_input("Password", type="password", key="pass")
         submitted = st.form_submit_button("Sign In")
         if submitted:
-            match = login_df[(login_df["Username"].astype(str) == username) & (login_df["Password"] == password)]
+            match = login_df[(login_df["Emp ID"].astype(str) == username) & (login_df["Password"] == password)]
             if not match.empty:
                 st.success("Login Successful")
                 st.session_state.authenticated = True
                 st.session_state.emp_id = username
                 st.session_state.emp_name = match.iloc[0]["Emp Name"]
-                st.session_state.team_lead = match.iloc[0]["Team Lead"]
+                st.session_state.team_lead = match.iloc[0]["Team Lead Name"]
                 log_session_start(username)
             else:
                 st.error("Invalid credentials")
 
 def form_page():
     st.image(logo, width=150)
-    st.markdown("<h2 style='color:skyblue;'>Production Form</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='color:skyblue;'>Form Entry</h2>", unsafe_allow_html=True)
+    with st.form("entry_form"):
+        today = datetime.now().strftime("%Y-%m-%d")
+        emp_id = st.session_state.emp_id
+        emp_name = st.session_state.emp_name
+        team_lead = st.session_state.team_lead
 
-    emp_id = st.session_state.emp_id
-    emp_name = st.session_state.emp_name
-    team_lead = st.session_state.team_lead
+        st.write("Emp ID:", emp_id)
+        st.write("Emp Name:", emp_name)
+        st.write("Team Lead Name:", team_lead)
 
-    # Initialize session state for fields if not already set
-    for key in ["chart_id", "dos", "icd"]:
-        if key not in st.session_state:
-            st.session_state[key] = ""
+        project = st.selectbox("Project", ["Elevance MA", "Elevance ACA", "Health OS"])
+        category = st.selectbox("Project Category", ["Entry", "Recheck", "QA"])
+        login_names = login_df["Login Name"].unique().tolist()
+        login_name = st.selectbox("Login Name", login_names)
+        login_id = login_df[login_df["Login Name"] == login_name]["Login ID"].values[0]
 
-    with st.form("production_form"):
-        date = st.date_input("Date", datetime.today())
-        chart_id = st.text_input("Chart ID", value=st.session_state.chart_id, key="chart_id")
-        dos = st.text_input("No of DOS", value=st.session_state.dos, key="dos")
-        icd = st.text_input("No of Codes", value=st.session_state.icd, key="icd")
+        chart_id = st.text_input("Chart ID")
+        page_no = st.text_input("Page No")
+        dos = st.text_input("No of DOS")
+        codes = st.text_input("No of Codes")
+        error_type = st.text_input("Error Type")
+        error_comments = st.text_input("Error Comments")
+        no_of_errors = st.text_input("No of Errors")
+        chart_status = st.text_input("Chart Status")
+        auditor_emp_id = st.text_input("Auditor Emp ID")
+        auditor_emp_name = st.text_input("Auditor Emp Name")
+
         submit = st.form_submit_button("Submit")
-
         if submit:
-            # Save data to CSV
-            new_data = {
-                "Date": date,
-                "Emp ID": emp_id,
-                "Emp Name": emp_name,
-                "Team Lead": team_lead,
-                "Chart ID": chart_id,
-                "No of DOS": dos,
-                "No of Codes": icd
-            }
-
-            file_path = "data.csv"
-            if os.path.exists(file_path):
-                df = pd.read_csv(file_path)
-                df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
-            else:
-                df = pd.DataFrame([new_data])
-            df.to_csv(file_path, index=False)
-
-            # Clear session state inputs
-            st.session_state.chart_id = ""
-            st.session_state.dos = ""
-            st.session_state.icd = ""
-
-            st.success("Form submitted successfully!")
+            new_data = pd.DataFrame([[
+                today, emp_id, emp_name, project, category,
+                login_id, login_name, team_lead, chart_id, page_no,
+                dos, codes, error_type, error_comments,
+                no_of_errors, chart_status, auditor_emp_id, auditor_emp_name
+            ]], columns=form_headers)
+            new_data.to_csv("data.csv", mode="a", header=not os.path.exists("data.csv"), index=False)
+            st.success("Data submitted successfully!")
 
 def dashboard_page():
     st.image(logo, width=150)
