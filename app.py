@@ -110,6 +110,14 @@ def form_page():
             ]], columns=form_headers)
             new_data.to_csv("data.csv", mode="a", header=not os.path.exists("data.csv"), index=False)
             st.success("Data submitted successfully!")
+# Reset form fields
+for key in [
+    "chart_id", "page_no", "dos", "codes", "error_type",
+    "error_comments", "no_of_errors", "chart_status",
+    "auditor_emp_id", "auditor_emp_name"
+]:
+    st.session_state[key] = ""
+
 
 def dashboard_page():
     st.image(logo, width=150)
